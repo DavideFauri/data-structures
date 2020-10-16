@@ -1,0 +1,29 @@
+name:                data-structures
+version:             0.1.0.0
+license:             MIT
+author:              Davide Fauri
+maintainer:          davide.fauri@gmail.com
+copyright:           2020 Davide Fauri
+
+extra-source-files:
+- README.md
+
+dependencies:
+- base >= 4.11 && < 10
+
+# recommended by RIO
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+  dependencies:
+    - tasty
+    - tasty-hunit
+    - tasty-quickcheck
