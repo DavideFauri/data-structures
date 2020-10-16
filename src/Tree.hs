@@ -4,8 +4,6 @@ module Tree where
 
 data Tree a = Leaf | Node (Tree a) a (Tree a) deriving (Eq)
 
-
-
 instance Show a => Show (Tree a) where
     show t = show' 0 t where
         show' _ Leaf = ""

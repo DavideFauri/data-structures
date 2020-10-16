@@ -1,9 +1,9 @@
-module OrderedTree (insert, performTests, fromList, OrderedTree(..)) where
+module OrderedTree ( OrderedTree
+                   , insert
+                   , fromList
+                   ) where
 
-import Test.Tasty.HUnit (testCase, (@?=))
-import Data.List (sort)
-import Test.Tasty (TestTree, defaultMain, testGroup)
-import Test.Tasty.QuickCheck (testProperty)
+
 
 import Tree (Tree(..), inorder)
 
@@ -36,26 +36,3 @@ insert item (OrderedTree t) = OrderedTree $ insert' item t
 
 fromList :: Ord a => [a] -> OrderedTree a
 fromList l = foldl (flip insert) (OrderedTree Leaf) l
-
--- TESTS
-
-performTests :: IO ()
-performTests = defaultMain $ testGroup "Testing Ordered Tree" [testInOrder, testInsert]
-
-testInOrder :: TestTree
-testInOrder = testCase "Inorder traversal works" $ [1, 2, 3, 4, 5] `compare` (inorder testTree) @?= EQ
-  where
-    testTree :: Tree Integer
-    testTree = Node (Node (Node Leaf 1 Leaf) 2 (Node Leaf 3 Leaf)) 4 (Node Leaf 5 Leaf)
-
-testInsert :: TestTree
-testInsert =
-  testGroup "Insert respects ordering" $
-    [ testProperty "Lists of numbers" (propInsert :: [Int] -> Bool),
-      testProperty "Lists of strings" (propInsert :: [String] -> Bool)
-    ]
-
-propInsert :: Ord a => [a] -> Bool
-propInsert list = sort list == (inorder tree)
-  where
-    OrderedTree tree = fromList list

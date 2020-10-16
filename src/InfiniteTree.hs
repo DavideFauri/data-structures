@@ -1,4 +1,6 @@
-module InfiniteTree (inv_tup_tree, cut) where
+module InfiniteTree ( inv_tup_tree
+                    , cut
+                    ) where
 
 import Tree (Tree(..))
 
