@@ -5,3 +5,4 @@ This repository contains my experiments and exercises in writing traditional dat
 At the moment I'm working on:
 ☐ Trees
     ✔ Recursive Trees
+    ✔ Ordered Trees
