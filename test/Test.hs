@@ -6,5 +6,5 @@ main :: IO ()
 main = defaultMain $ allTests
 
 allTests :: TestTree
-allTests = testGroup "Testing..." $ [ testTree
-                                    ]
+allTests = testGroup "" $ [ testTree
+                          ]
