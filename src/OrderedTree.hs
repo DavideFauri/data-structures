@@ -1,19 +1,25 @@
 module OrderedTree ( OrderedTree
                    , insert
+                   , inorder
                    , fromList
                    ) where
 
 
 
-import Tree (Tree(..), inorder)
+
+import Tree (Tree(..))
+import qualified Tree as T (inorder)
 
 newtype OrderedTree a = OrderedTree (Tree a)
 
 instance Ord a => Semigroup (OrderedTree a) where
-  (<>) t1 (OrderedTree t2) = foldr insert t1 (inorder t2)
+  (<>) t1 (OrderedTree t2) = foldr insert t1 (T.inorder t2)
 
 instance Ord a => Monoid (OrderedTree a) where
   mempty = OrderedTree Leaf
+
+inorder :: OrderedTree a -> [a]
+inorder (OrderedTree t) = T.inorder t
 
 -- I have a binary tree whose node are sorted: i.e., each node in the left branch is smaller than the root, each node in the right branch is larger
 -- I want to implement:
