@@ -1,14 +1,17 @@
-module OrderedTree ( OrderedTree
-                   , insert
-                   , inorder
-                   , fromList
-                   ) where
+module OrderedTree
+  ( OrderedTree,
+    insert,
+    inorder,
+    fromList,
 
 
-import Tree (Tree(..))
+  )
+where
+
+import Tree (Tree (..))
 import qualified Tree as T (inorder)
 
-newtype OrderedTree a = OrderedTree (Tree a) deriving Eq
+newtype OrderedTree a = OrderedTree (Tree a) deriving (Eq)
 
 instance Show a => Show (OrderedTree a) where
   show (OrderedTree t) = show t

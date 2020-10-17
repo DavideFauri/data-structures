@@ -29,7 +29,7 @@ library:
 
 tests:
   data-structures-test:
-    main:        Test.hs
+    main:        Main.hs
     source-dirs: test
     dependencies:
       - data-structures

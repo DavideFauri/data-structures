@@ -1,8 +1,10 @@
-module InfiniteTree ( inv_tup_tree
-                    , cut
-                    ) where
+module InfiniteTree
+  ( inv_tup_tree,
+    cut,
+  )
+where
 
-import Tree (Tree(..))
+import Tree (Tree (..))
 
 -- I have a binary tree whose nodes are (Integer, Integer) tuples that tell me how many times I brnched left or right
 -- ex. Root is (0,0), left branch has node (1,0), right branch has node (0,1)
