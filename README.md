@@ -10,5 +10,16 @@ At the moment I'm working on:
 
     ✔ Recursive Trees
     ✔ Ordered Trees
-    ☐ BFS and DFS on Trees
+    ☐ Traversal
+    ☐ Search
     ☐ Red-Black Trees
+
+☐ Matrices
+
+☐ Filters?
+    ☐ Kalman
+    ☐ EKF
+    ☐ UKF
+    ☐ Particle Filtering?
+
+☐ Advanced Data Structures
