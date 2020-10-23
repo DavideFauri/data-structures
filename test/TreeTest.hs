@@ -4,9 +4,24 @@ module TreeTest (testSimpleTree) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
+import Test.Tasty.QuickCheck
 import Tree
 
 -- UTILS
+
+newtype AnyTree a = AnyTree {toTree :: Tree a} deriving (Show)
+
+instance (Arbitrary a) => Arbitrary (AnyTree a) where
+  arbitrary = AnyTree <$> sized makeTree
+    where
+      makeTree :: (Arbitrary a) => Int -> Gen (Tree a)
+      makeTree 0 = pure Leaf
+      makeTree n = do
+        m <- choose (0, n)
+        l <- makeTree m
+        c <- arbitrary
+        r <- makeTree (n - m)
+        pure $ Node l c r
 
 data ExampleTree a = (Show a, Eq a) =>
   ExampleTree
