@@ -3,7 +3,7 @@
 module OrderedTreeTest (testOrderedTree) where
 
 import Data.List (sort)
-import OrderedTree (OrderedTree, fromList, inorder, insert)
+import OrderedTree (OrderedTree, fromList, insert, toList)
 import Test.Tasty
 import Test.Tasty.QuickCheck
 
@@ -16,7 +16,7 @@ instance (Ord a, Arbitrary a) => Arbitrary (AnyOrderedTree a) where
 
 isOrdered :: Ord a => OrderedTree a -> Bool
 isOrdered t =
-  let traversal = inorder t
+  let traversal = toList t
    in traversal == sort traversal
 
 -- TESTS

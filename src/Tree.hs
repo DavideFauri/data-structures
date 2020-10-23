@@ -66,3 +66,50 @@ instance Applicative Tree where
 -- pure (.) <*> u <*> v <*> w = u <*> (v <*> w) -- Composition Law
 -- I have no idea if how to verify if it's respected or not, let's just say it is
 
+
+-- DEPTH FIRST TRAVERSALS
+
+newtype InOrder a = InOrder (Tree a) deriving (Eq, Show, Functor)
+
+instance Foldable InOrder where
+  foldMap func (InOrder t) = foldMap' func t
+    where
+      foldMap' _ Leaf = mempty
+      foldMap' f (Node l c r) = foldMap' f l <> f c <> foldMap' f r
+
+
+newtype PreOrder a = PreOrder (Tree a) deriving (Eq, Show, Functor)
+
+instance Foldable PreOrder where
+  foldMap func (PreOrder t) = foldMap' func t
+    where
+      foldMap' _ Leaf = mempty
+      foldMap' f (Node l c r) = f c <> foldMap' f l <> foldMap' f r
+
+newtype PostOrder a = PostOrder (Tree a) deriving (Eq, Show, Functor)
+
+instance Foldable PostOrder where
+  foldMap func (PostOrder t) = foldMap' func t
+    where
+      foldMap' _ Leaf = mempty
+      foldMap' f (Node l c r) = foldMap' f l <> foldMap' f r <> f c
+
+
+-- BREADTH FIRST TRAVERSAL (level order)
+
+newtype LevelOrder a = LevelOrder (Tree a) deriving (Eq, Show, Functor)
+
+-- thanks to https://www.jjinux.com/2005/12/haskell-breadth-first-tree-traversal.html
+instance Foldable LevelOrder where
+  foldMap _ (LevelOrder Leaf) = mempty
+  foldMap func (LevelOrder root) = foldMap (func . getValue) $ breadthFirst [root]
+    where
+      getValue (Node _ c _) = c
+
+      breadthFirst [] = []
+      breadthFirst nodes@(_ : _) = nodes ++ (breadthFirst $ concatMap getChildren nodes)
+
+      getChildren (Node Leaf _ Leaf) = []
+      getChildren (Node Leaf _ r) = [r]
+      getChildren (Node l _ Leaf) = [l]
+      getChildren (Node l _ r) = [l, r]

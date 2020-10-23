@@ -1,26 +1,26 @@
+{-# LANGUAGE DeriveFoldable #-}
+
 module OrderedTree
   ( OrderedTree,
     insert,
-    inorder,
     fromList,
-
-
+    toList,
   )
 where
 
-import Tree (Tree (..))
-import qualified Tree as T (inorder)
+import Data.Foldable (toList)
+import Tree (InOrder (..), Tree (..))
 
-newtype OrderedTree a = OrderedTree (Tree a) deriving (Eq)
+newtype OrderedTree a = OrderedTree (InOrder a) deriving (Eq, Foldable)
 
 instance Show a => Show (OrderedTree a) where
   show (OrderedTree t) = show t
 
 instance Ord a => Semigroup (OrderedTree a) where
-  t1 <> (OrderedTree t2) = foldr insert t1 (T.inorder t2)
+  t1 <> (OrderedTree t2) = foldr insert t1 t2
 
 instance Ord a => Monoid (OrderedTree a) where
-  mempty = OrderedTree Leaf
+  mempty = OrderedTree . InOrder $ Leaf
 
 -- I have a binary tree whose node are sorted: i.e., each node in the left branch is smaller than the root, each node in the right branch is larger
 -- I want to:
@@ -28,13 +28,11 @@ instance Ord a => Monoid (OrderedTree a) where
 --     insert :: (Ord a) => a -> OrderedTree a -> OrderedTree a
 --   - implement a smart constructor from lists to ordered trees
 --     fromList :: (Ord a) => [a] -> OrderedTree a
---   - re-implement tree traversal
---     inorder :: OrderedTree a -> [a]
 --   - a QuickCheck property that checks if the inorder traversal of a tree built with "insert" is actually ordered
 --   - (optional) a smart constructor that enforces the ordered property
 
 insert :: (Ord a) => a -> OrderedTree a -> OrderedTree a
-insert item (OrderedTree t) = OrderedTree $ insert' item t
+insert item (OrderedTree (InOrder t)) = OrderedTree . InOrder $ insert' item t
   where
     insert' x Leaf = Node Leaf x Leaf
     insert' x (Node l c r)
@@ -43,6 +41,3 @@ insert item (OrderedTree t) = OrderedTree $ insert' item t
 
 fromList :: (Ord a) => [a] -> OrderedTree a
 fromList l = foldl (flip insert) mempty l
-
-inorder :: OrderedTree a -> [a]
-inorder (OrderedTree t) = T.inorder t
