@@ -3,7 +3,7 @@
 
 module Tree where
 
-import Types (Iso (..))
+import Types (Iso (..), IsoOrd (..))
 
 data Tree a = Leaf | Node a (Tree a) (Tree a) deriving (Eq, Functor)
 
@@ -23,19 +23,18 @@ instance Iso Tree where
   -- This is because traversal is important, and we don't want to mess it up
   Node _ l1 r1 ~== Node _ l2 r2 = (l1 ~== l2) && (r1 ~== r2)
 
-instance Applicative Tree where
-  -- wrapping a value creates a 1-node tree
-  pure x = Node Leaf x Leaf
+instance IsoOrd Tree where
+  compare Leaf Leaf = Just EQ
+  compare Leaf (Node _ _ _) = Just LT
+  compare (Node _ _ _) Leaf = Just GT
+  compare (Node _ l1 r1) (Node _ l2 r2)
+    | l1 ~== l2 && r1 ~== r2 = Just EQ
+    | l1 ~<= l2 && r1 ~<= r2 = Just LT
+    | l1 ~>= l2 && r1 ~>= r2 = Just GT
+    | otherwise = Nothing
 
-  -- applying a tree of functions to an empty tree of values returns an empty tree
-  _ <*> Leaf = Leaf
-  -- applying an empty tree of functions returns an empty tree
-  Leaf <*> _ = Leaf
-  -- Applying a tree of functions to a tree of values is easy if the trees are isomorphic.
-  -- If not, we create a maximal tree where the "center" function or value is propagated
-  -- left or right when the corresponding branch is missing.
-  -- ex.   Node (Node Leaf (*3) Leaf) (*2) Leaf <*> Node Leaf 2 (Node Leaf 5 Leaf) ==
-  --       Node (Node Leaf 6 Leaf) 4 (Node Leaf 10 Leaf)
+showStructure :: Tree a -> String
+showStructure = show . fmap (const "X")
 
 -- DEPTH FIRST TRAVERSALS
 

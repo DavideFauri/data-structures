@@ -7,6 +7,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
 import Tree
+import Types (Iso (..), IsoOrd (..))
 
 -- UTILS
 
@@ -45,6 +46,24 @@ testSimpleTree =
           testUnitCase singletonTree,
           testUnitCase smallIntTree,
           testUnitCase smallStringTree
+        ],
+      testGroup "Instances" $
+        [ testGroup "Iso" $
+            [ testIsomorphic (emptyTree :: ExampleTree Double) (emptyTree :: ExampleTree Char),
+              testIsomorphic smallFuncTree smallIntTree,
+              testNotIsomorphic (emptyTree :: ExampleTree Int) singletonTree,
+              testNotIsomorphic smallIntTree (emptyTree :: ExampleTree Double),
+              testNotIsomorphic smallIntTree singletonTree,
+              testNotIsomorphic smallIntTree superIntTree,
+              testNotIsomorphic smallIntTree notSuperIntTree
+            ],
+          testGroup "IsoOrd" $
+            [ testSubmorphic (emptyTree :: ExampleTree Int) singletonTree,
+              testSubmorphic singletonTree smallIntTree,
+              testSubmorphic smallIntTree superIntTree,
+              testSupermorphic superIntTree smallIntTree,
+              testFailMorphic superIntTree notSuperIntTree
+            ]
         ]
     ]
 
@@ -73,6 +92,53 @@ testPostOrder ExampleTree {tree = t, postorder = l} = toList (PostOrder t) @?= l
 
 testLevelOrder :: (Show a, Eq a) => ExampleTree a -> Assertion
 testLevelOrder ExampleTree {tree = t, levelorder = l} = toList (LevelOrder t) @?= l
+
+failMorphicMsg :: ExampleTree a -> ExampleTree b -> String
+failMorphicMsg t1 t2 =
+  "Mismatching structure.\n"
+    <> name t1
+    <> " has structure:\n"
+    <> showStructure (tree t1)
+    <> "\nbut\n"
+    <> name t2
+    <> " has structure:\n"
+    <> showStructure (tree t2)
+
+testIsomorphic :: ExampleTree a -> ExampleTree b -> TestTree
+testIsomorphic t1 t2 =
+  testCase (name t1 <> " is isomorphic to " <> name t2) $
+    assertBool (failMorphicMsg t1 t2) $
+      tree t1 ~== tree t2
+
+testNotIsomorphic :: ExampleTree a -> ExampleTree b -> TestTree
+testNotIsomorphic t1 t2 =
+  testCase (name t1 <> " is not isomorphic to " <> name t2) $
+    assertBool (failMorphicMsg t1 t2) $
+      tree t1 ~/= tree t2
+
+testSubmorphic :: ExampleTree a -> ExampleTree b -> TestTree
+testSubmorphic tSub tSuper =
+  testCase (name tSub <> " is submorphic to " <> name tSuper) $
+    assertEqual
+      (failMorphicMsg tSub tSuper)
+      (Just LT)
+      (Types.compare (tree tSub) (tree tSuper))
+
+testSupermorphic :: ExampleTree a -> ExampleTree b -> TestTree
+testSupermorphic tSuper tSub =
+  testCase (name tSuper <> " is supermorphic to " <> name tSub) $
+    assertEqual
+      (failMorphicMsg tSuper tSub)
+      (Just GT)
+      (Types.compare (tree tSuper) (tree tSub))
+
+testFailMorphic :: ExampleTree a -> ExampleTree b -> TestTree
+testFailMorphic t1 t2 =
+  testCase (name t1 <> " can't be morphologically compared to " <> name t2) $
+    assertEqual
+      (failMorphicMsg t1 t2)
+      Nothing
+      (Types.compare (tree t1) (tree t2))
 
 -- UNIT CASES
 
@@ -110,4 +176,37 @@ smallIntTree =
       preorder = [1, 2, 4, 5, 3],
       postorder = [4, 5, 2, 3, 1],
       levelorder = [1, 2, 3, 4, 5]
+    }
+
+smallStringTree :: ExampleTree String
+smallStringTree =
+  ExampleTree
+    { name = "Small String",
+      tree = Node "This" (Node "Sentence" (Node "Is" Leaf Leaf) (Node "Wrong" Leaf Leaf)) Leaf,
+      toStr = "\"This\"\n  \"Sentence\"\n    \"Is\"\n    \"Wrong\"\n",
+      inorder = ["Is", "Sentence", "Wrong", "This"],
+      preorder = ["This", "Sentence", "Is", "Wrong"],
+      postorder = ["Is", "Wrong", "Sentence", "This"],
+      levelorder = ["This", "Sentence", "Is", "Wrong"]
+    }
+
+superIntTree :: ExampleTree Int
+superIntTree =
+  emptyTree
+    { name = "Medium Int (super of small Int)",
+      tree = Node 1 (Node 2 (Node 4 Leaf Leaf) (Node 5 (Node 6 Leaf Leaf) Leaf)) (Node 3 Leaf (Node 7 Leaf Leaf))
+    }
+
+notSuperIntTree :: ExampleTree Int
+notSuperIntTree =
+  emptyTree
+    { name = "Medium Int (not super of small Int)",
+      tree = Node 1 (Node 2 (Node 4 Leaf Leaf) Leaf) (Node 3 Leaf (Node 7 Leaf Leaf))
+    }
+
+smallFuncTree :: ExampleTree (Int -> Int)
+smallFuncTree =
+  emptyTree
+    { name = "Small functions",
+      tree = Node (* 1) (Node (* 10) (Node (* 100) Leaf Leaf) (Node (* 1000) Leaf Leaf)) (Node (* 1000) Leaf Leaf)
     }

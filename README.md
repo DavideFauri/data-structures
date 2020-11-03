@@ -10,6 +10,7 @@ At the moment I'm working on:
 
     ✔ Recursive Trees
     ✔ Ordered Trees
+    ✔ Isomorphic Trees
     ☐ Traversal
     ☐ Search
     ☐ Red-Black Trees
