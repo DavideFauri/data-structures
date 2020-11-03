@@ -1,35 +1,35 @@
-name:                data-structures
-version:             0.1.0.0
-license:             MIT
-author:              Davide Fauri
-maintainer:          davide.fauri@gmail.com
-copyright:           2020 Davide Fauri
+name: data-structures
+version: 0.1.0.0
+license: MIT
+author: Davide Fauri
+maintainer: davide.fauri@gmail.com
+copyright: 2020 Davide Fauri
 
 extra-source-files:
-- README.md
+  - README.md
 
 dependencies:
-- base >= 4.11 && < 10
-- tasty
-- tasty-hunit
-- tasty-quickcheck
+  - base >= 4.11 && < 10
+  - tasty
+  - tasty-hunit
+  - tasty-quickcheck
 
 # recommended by RIO
 ghc-options:
-- -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wpartial-fields
-- -Wredundant-constraints
+  - -Wall
+  - -Wcompat
+  - -Widentities
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wpartial-fields
+  - -Wredundant-constraints
 
 library:
   source-dirs: src
 
 tests:
   data-structures-test:
-    main:        Main.hs
+    main: Main.hs
     source-dirs: test
     dependencies:
       - data-structures

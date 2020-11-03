@@ -20,12 +20,12 @@ instance (Arbitrary a) => Arbitrary (AnyTree a) where
       makeTree n = do
         m <- choose (0, n)
         l <- makeTree m
-        c <- arbitrary
+        x <- arbitrary
         r <- makeTree (n - m)
-        pure $ Node l c r
+        pure $ Node x l r
 
-data ExampleTree a = (Show a, Eq a) =>
-  ExampleTree
+data ExampleTree a --(Show a, Eq a) =>
+  = ExampleTree
   { name :: String,
     tree :: Tree a,
     toStr :: String,
@@ -37,8 +37,19 @@ data ExampleTree a = (Show a, Eq a) =>
 
 -- TESTS
 
-tests :: ExampleTree a -> TestTree
-tests ex =
+testSimpleTree :: TestTree
+testSimpleTree =
+  testGroup "Tree" $
+    [ testGroup "Unit cases" $
+        [ testUnitCase (emptyTree :: ExampleTree Double),
+          testUnitCase singletonTree,
+          testUnitCase smallIntTree,
+          testUnitCase smallStringTree
+        ]
+    ]
+
+testUnitCase :: (Show a, Eq a) => ExampleTree a -> TestTree
+testUnitCase ex =
   testGroup
     (name ex)
     [ testCase "is pretty printed" $ testShow ex,
@@ -48,36 +59,27 @@ tests ex =
       testCase "is traversed levelorder" $ testLevelOrder ex
     ]
 
-testShow :: ExampleTree a -> Assertion
+testShow :: Show a => ExampleTree a -> Assertion
 testShow ExampleTree {tree = t, toStr = s} = show t @?= s
 
-testInOrder :: ExampleTree a -> Assertion
+testInOrder :: (Show a, Eq a) => ExampleTree a -> Assertion
 testInOrder ExampleTree {tree = t, inorder = l} = toList (InOrder t) @?= l
 
-testPreOrder :: ExampleTree a -> Assertion
+testPreOrder :: (Show a, Eq a) => ExampleTree a -> Assertion
 testPreOrder ExampleTree {tree = t, preorder = l} = toList (PreOrder t) @?= l
 
-testPostOrder :: ExampleTree a -> Assertion
+testPostOrder :: (Show a, Eq a) => ExampleTree a -> Assertion
 testPostOrder ExampleTree {tree = t, postorder = l} = toList (PostOrder t) @?= l
 
-testLevelOrder :: ExampleTree a -> Assertion
+testLevelOrder :: (Show a, Eq a) => ExampleTree a -> Assertion
 testLevelOrder ExampleTree {tree = t, levelorder = l} = toList (LevelOrder t) @?= l
 
 -- UNIT CASES
 
-testSimpleTree :: TestTree
-testSimpleTree =
-  testGroup
-    "Tree"
-    [ tests emptyTree,
-      tests singletonTree,
-      tests smallIntTree
-    ]
-
-emptyTree :: ExampleTree Int
+emptyTree :: ExampleTree a
 emptyTree =
   ExampleTree
-    { name = "Empty tree",
+    { name = "Empty",
       tree = Leaf,
       toStr = "",
       inorder = [],
@@ -86,23 +88,23 @@ emptyTree =
       levelorder = []
     }
 
-singletonTree :: ExampleTree String
+singletonTree :: ExampleTree Int
 singletonTree =
   ExampleTree
-    { name = "Singleton tree",
-      tree = Node Leaf "example" Leaf,
-      toStr = "\"example\"\n",
-      inorder = ["example"],
-      preorder = ["example"],
-      postorder = ["example"],
-      levelorder = ["example"]
+    { name = "Singleton",
+      tree = Node 42 Leaf Leaf,
+      toStr = "42\n",
+      inorder = [42],
+      preorder = [42],
+      postorder = [42],
+      levelorder = [42]
     }
 
 smallIntTree :: ExampleTree Int
 smallIntTree =
   ExampleTree
-    { name = "Small tree of Int",
-      tree = Node (Node (Node Leaf 4 Leaf) 2 (Node Leaf 5 Leaf)) 1 (Node Leaf 3 Leaf),
+    { name = "Small Int",
+      tree = Node 1 (Node 2 (Node 4 Leaf Leaf) (Node 5 Leaf Leaf)) (Node 3 Leaf Leaf),
       toStr = "1\n  2\n    4\n    5\n  3\n",
       inorder = [4, 2, 5, 1, 3],
       preorder = [1, 2, 4, 5, 3],

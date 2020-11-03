@@ -5,23 +5,23 @@ module Tree where
 
 import Types (Iso (..))
 
-data Tree a = Leaf | Node (Tree a) a (Tree a) deriving (Eq, Functor)
+data Tree a = Leaf | Node a (Tree a) (Tree a) deriving (Eq, Functor)
 
-instance Show a => Show (Tree a) where
-  show t = show' 0 t
-    where
+-- PRINTING
       show' _ Leaf = ""
-      show' depth (Node l c r) = spacing ++ show c ++ "\n" ++ show' (depth + 2) l ++ show' (depth + 2) r
+      show' depth (Node x l r) = spacing ++ show x ++ "\n" ++ show' (depth + 2) l ++ show' (depth + 2) r
         where
           spacing = take depth $ repeat ' '
 
-instance Iso (Tree a) where
-  Leaf =~= Leaf = True
-  Leaf =~= Node _ _ _ = False
-  Node _ _ _ =~= Leaf = False
+-- STRUCTURE
+
+instance Iso Tree where
+  Leaf ~== Leaf = True
+  Leaf ~== Node _ _ _ = False
+  Node _ _ _ ~== Leaf = False
   -- We DO NOT consider flipping L/R branches when checking for isomorphism between trees
   -- This is because traversal is important, and we don't want to mess it up
-  Node l1 _ r1 =~= Node l2 _ r2 = (l1 =~= l2) && (r1 =~= r2)
+  Node _ l1 r1 ~== Node _ l2 r2 = (l1 ~== l2) && (r1 ~== r2)
 
 instance Applicative Tree where
   -- wrapping a value creates a 1-node tree
@@ -37,37 +37,10 @@ instance Applicative Tree where
   -- ex.   Node (Node Leaf (*3) Leaf) (*2) Leaf <*> Node Leaf 2 (Node Leaf 5 Leaf) ==
   --       Node (Node Leaf 6 Leaf) 4 (Node Leaf 10 Leaf)
 
-  -- case 1, only have center function
-  Node Leaf fc Leaf <*> Node l c r = Node (pure fc <*> l) (fc c) (pure fc <*> r)
-  -- case 2, only have center and left functions
-  Node fl fc Leaf <*> Node Leaf c r = Node (fl <*> pure c) (fc c) (pure fc <*> r)
-  Node fl fc Leaf <*> Node l c r = Node (fl <*> l) (fc c) (pure fc <*> r)
-  -- case 3, only have center and right functions
-  Node Leaf fc fr <*> Node l c Leaf = Node (pure fc <*> l) (fc c) (fr <*> pure c)
-  Node Leaf fc fr <*> Node l c r = Node (pure fc <*> l) (fc c) (fr <*> r)
-  -- case 4, have all functions
-  Node fl fc fr <*> Node Leaf c Leaf = Node (fl <*> pure c) (fc c) (fr <*> pure c)
-  Node fl fc fr <*> Node l c Leaf = Node (fl <*> l) (fc c) (fr <*> pure c)
-  Node fl fc fr <*> Node Leaf c r = Node (fl <*> pure c) (fc c) (fr <*> r)
-  Node fl fc fr <*> Node l c r = Node (fl <*> l) (fc c) (fr <*> r)
-
--- pure id <*> v = v                            -- Identity Law
--- Node Leaf id Leaf <*> t = t                                                             --> (case 1)
-
--- pure f <*> pure x = pure (f x)               -- Homomorphism Law
--- Node Leaf f Leaf <*> Node Leaf x Leaf = Node Leaf (f x) Leaf                            --> (case 1)
-
--- u <*> pure y = pure ($ y) <*> u              -- Interchange Law
--- Leaf <*> Node Leaf y Leaf = Node Leaf ($ y) Leaf <*> Leaf                               --> (leaves)
--- Node fl   fc Leaf <*> Node Leaf y Leaf = Node Leaf ($ y) Leaf <*> Node fl   fc Leaf     --> (case 2)
--- Node Leaf fc fr   <*> Node Leaf y Leaf = Node Leaf ($ y) Leaf <*> Node Leaf fc fr       --> (case 3)
--- Node fl   fc fr   <*> Node Leaf y Leaf = Node Leaf ($ y) Leaf <*> Node fl   fc fr       --> (case 4)
-
--- pure (.) <*> u <*> v <*> w = u <*> (v <*> w) -- Composition Law
--- I have no idea if how to verify if it's respected or not, let's just say it is
-
-
 -- DEPTH FIRST TRAVERSALS
+
+
+-- INORDER
 
 newtype InOrder a = InOrder (Tree a) deriving (Eq, Show, Functor)
 
@@ -75,8 +48,9 @@ instance Foldable InOrder where
   foldMap func (InOrder t) = foldMap' func t
     where
       foldMap' _ Leaf = mempty
-      foldMap' f (Node l c r) = foldMap' f l <> f c <> foldMap' f r
+      foldMap' f (Node x l r) = foldMap' f l <> f x <> foldMap' f r
 
+-- PREORDER
 
 newtype PreOrder a = PreOrder (Tree a) deriving (Eq, Show, Functor)
 
@@ -84,7 +58,9 @@ instance Foldable PreOrder where
   foldMap func (PreOrder t) = foldMap' func t
     where
       foldMap' _ Leaf = mempty
-      foldMap' f (Node l c r) = f c <> foldMap' f l <> foldMap' f r
+      foldMap' f (Node x l r) = f x <> foldMap' f l <> foldMap' f r
+
+-- POSTORDER
 
 newtype PostOrder a = PostOrder (Tree a) deriving (Eq, Show, Functor)
 
@@ -92,7 +68,7 @@ instance Foldable PostOrder where
   foldMap func (PostOrder t) = foldMap' func t
     where
       foldMap' _ Leaf = mempty
-      foldMap' f (Node l c r) = foldMap' f l <> foldMap' f r <> f c
+      foldMap' f (Node x l r) = foldMap' f l <> foldMap' f r <> f x
 
 
 -- BREADTH FIRST TRAVERSAL (level order)
@@ -101,15 +77,13 @@ newtype LevelOrder a = LevelOrder (Tree a) deriving (Eq, Show, Functor)
 
 -- thanks to https://www.jjinux.com/2005/12/haskell-breadth-first-tree-traversal.html
 instance Foldable LevelOrder where
-  foldMap _ (LevelOrder Leaf) = mempty
-  foldMap func (LevelOrder root) = foldMap (func . getValue) $ breadthFirst [root]
+  foldMap func (LevelOrder root) = foldMap funcOnValue $ breadthFirst [root]
     where
-      getValue (Node _ c _) = c
+      funcOnValue (Node x _ _) = func x
+      funcOnValue Leaf = mempty
 
       breadthFirst [] = []
-      breadthFirst nodes@(_ : _) = nodes ++ (breadthFirst $ concatMap getChildren nodes)
+      breadthFirst nodes@(_ : _) = nodes <> (breadthFirst $ concatMap getChildren nodes)
 
-      getChildren (Node Leaf _ Leaf) = []
-      getChildren (Node Leaf _ r) = [r]
-      getChildren (Node l _ Leaf) = [l]
-      getChildren (Node l _ r) = [l, r]
+      getChildren (Node _ l r) = [l, r]
+      getChildren Leaf = []

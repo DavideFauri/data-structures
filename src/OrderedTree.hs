@@ -34,10 +34,10 @@ instance Ord a => Monoid (OrderedTree a) where
 insert :: (Ord a) => a -> OrderedTree a -> OrderedTree a
 insert item (OrderedTree (InOrder t)) = OrderedTree . InOrder $ insert' item t
   where
-    insert' x Leaf = Node Leaf x Leaf
-    insert' x (Node l c r)
-      | x <= c = Node (insert' x l) c r
-      | otherwise = Node l c (insert' x r)
+    insert' x Leaf = Node x Leaf Leaf
+    insert' x (Node c l r)
+      | x <= c = Node c (insert' x l) r
+      | otherwise = Node c l (insert' x r)
 
 fromList :: (Ord a) => [a] -> OrderedTree a
 fromList l = foldl (flip insert) mempty l
