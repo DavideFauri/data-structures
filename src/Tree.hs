@@ -1,5 +1,8 @@
 {-# LANGUAGE DeriveFunctor #-}
+-- for instance Show (Tree String)
 {-# LANGUAGE FlexibleInstances #-}
+-- for instance Show on overlapping types (String and Show a)
+{-# LANGUAGE IncoherentInstances #-}
 
 module Tree where
 
@@ -8,10 +11,23 @@ import Types (Iso (..), IsoOrd (..))
 data Tree a = Leaf | Node a (Tree a) (Tree a) deriving (Eq, Functor)
 
 -- PRINTING
-      show' _ Leaf = ""
-      show' depth (Node x l r) = spacing ++ show x ++ "\n" ++ show' (depth + 2) l ++ show' (depth + 2) r
-        where
-          spacing = take depth $ repeat ' '
+
+_prettyPrintWith :: (a -> String) -> Tree a -> String
+_prettyPrintWith customShow tree = prettyPrint 0 tree
+  where
+    prettyPrint _ Leaf = ""
+    prettyPrint depth (Node x l r) =
+      spacing <> customShow x <> "\n"
+        <> prettyPrint (depth + 2) l
+        <> prettyPrint (depth + 2) r
+      where
+        spacing = take depth $ repeat ' '
+
+instance Show (Tree String) where
+  show = _prettyPrintWith id
+
+instance Show a => Show (Tree a) where
+  show = _prettyPrintWith show
 
 -- STRUCTURE
 
