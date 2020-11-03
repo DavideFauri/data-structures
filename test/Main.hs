@@ -1,3 +1,4 @@
+import InfiniteTreeTest (testInfiniteTree)
 import OrderedTreeTest (testOrderedTree)
 import Test.Tasty
 import TreeSearchTest (testTreeSearch)
@@ -10,6 +11,5 @@ allTests :: TestTree
 allTests =
   testGroup "" $
     [ testSimpleTree,
-      testOrderedTree,
-      testTreeSearch
+      testInfiniteTree,
     ]

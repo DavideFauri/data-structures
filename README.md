@@ -8,7 +8,7 @@ At the moment I'm working on:
 ✔ Test infrastructure (tasty)
 ☐ Trees
 
-    ✔ Recursive Trees
+    ✔ Infinite Trees
     ✔ Ordered Trees
     ✔ Isomorphic Trees
     ☐ Traversal
