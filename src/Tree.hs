@@ -50,7 +50,10 @@ instance IsoOrd Tree where
     | otherwise = Nothing
 
 showStructure :: Tree a -> String
-showStructure = show . fmap (const "X")
+showStructure = show . remap "X"
+  where
+    remap _ Leaf = Leaf
+    remap c (Node _ l r) = Node c (remap "L" l) (remap "R" r)
 
 -- DEPTH FIRST TRAVERSALS
 

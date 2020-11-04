@@ -201,7 +201,7 @@ notSuperIntTree :: ExampleTree Int
 notSuperIntTree =
   emptyTree
     { name = "Medium Int (not super of small Int)",
-      tree = Node 1 (Node 2 (Node 4 Leaf Leaf) Leaf) (Node 3 Leaf (Node 7 Leaf Leaf))
+      tree = Node 1 (Node 2 (Node 4 Leaf Leaf) Leaf) (Node 3 Leaf (Node 7 (Node 8 Leaf Leaf) Leaf))
     }
 
 smallFuncTree :: ExampleTree (Int -> Int)
