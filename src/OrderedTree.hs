@@ -11,13 +11,10 @@ where
 import Data.Foldable (toList)
 import Tree (InOrder (..), Tree (..))
 
-newtype OrderedTree a = OrderedTree (InOrder a) deriving (Eq, Foldable)
-
-instance Show a => Show (OrderedTree a) where
-  show (OrderedTree t) = show t
+newtype OrderedTree a = OrderedTree (InOrder a) deriving (Eq, Show, Foldable)
 
 instance Ord a => Semigroup (OrderedTree a) where
-  t1 <> (OrderedTree t2) = foldr insert t1 t2
+  (<>) = foldr insert
 
 instance Ord a => Monoid (OrderedTree a) where
   mempty = OrderedTree . InOrder $ Leaf
