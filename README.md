@@ -4,23 +4,24 @@ This repository contains my experiments and exercises in writing traditional dat
 
 At the moment I'm working on:
 
-✔ Environment setup (haskell-language-server + hlint + ormolu)
-✔ Test infrastructure (tasty)
-☐ Trees
+    ✔ Environment setup (haskell-language-server + hlint + ormolu)
+    ✔ Test infrastructure (tasty)
+    ☐ Trees
 
-    ✔ Infinite Trees
-    ✔ Ordered Trees
-    ✔ Isomorphic Trees
-    ☐ Traversal
-    ☐ Search
-    ☐ Red-Black Trees
+        ✔ Infinite Trees
+        ✔ Ordered Trees
+        ✔ Isomorphic Trees
+        ☐ Traversal
+        ☐ Search
+        ☐ Red-Black Trees
 
-☐ Matrices
+    ☐ Matrices
 
-☐ Filters?
-    ☐ Kalman
-    ☐ EKF
-    ☐ UKF
-    ☐ Particle Filtering?
+    ☐ Filters?
 
-☐ Advanced Data Structures
+        ☐ Kalman
+        ☐ EKF
+        ☐ UKF
+        ☐ Particle Filtering?
+
+    ☐ Advanced Data Structures
