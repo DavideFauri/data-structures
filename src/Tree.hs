@@ -13,7 +13,7 @@ data Tree a = Leaf | Node a (Tree a) (Tree a) deriving (Eq, Functor)
 -- PRINTING
 
 _prettyPrintWith :: (a -> String) -> Tree a -> String
-_prettyPrintWith customShow tree = prettyPrint 0 tree
+_prettyPrintWith customShow = prettyPrint 0
   where
     prettyPrint _ Leaf = ""
     prettyPrint depth (Node x l r) =
@@ -21,7 +21,7 @@ _prettyPrintWith customShow tree = prettyPrint 0 tree
         <> prettyPrint (depth + 2) l
         <> prettyPrint (depth + 2) r
       where
-        spacing = take depth $ repeat ' '
+        spacing = replicate depth ' '
 
 instance Show (Tree String) where
   show = _prettyPrintWith id
@@ -33,16 +33,16 @@ instance Show a => Show (Tree a) where
 
 instance Iso Tree where
   Leaf ~== Leaf = True
-  Leaf ~== Node _ _ _ = False
-  Node _ _ _ ~== Leaf = False
+  Leaf ~== Node {} = False
+  Node {} ~== Leaf = False
   -- We DO NOT consider flipping L/R branches when checking for isomorphism between trees
   -- This is because traversal is important, and we don't want to mess it up
   Node _ l1 r1 ~== Node _ l2 r2 = (l1 ~== l2) && (r1 ~== r2)
 
 instance IsoOrd Tree where
   compare Leaf Leaf = Just EQ
-  compare Leaf (Node _ _ _) = Just LT
-  compare (Node _ _ _) Leaf = Just GT
+  compare Leaf (Node {}) = Just LT
+  compare (Node {}) Leaf = Just GT
   compare (Node _ l1 r1) (Node _ l2 r2)
     | l1 ~== l2 && r1 ~== r2 = Just EQ
     | l1 ~<= l2 && r1 ~<= r2 = Just LT
@@ -101,7 +101,7 @@ instance Foldable LevelOrder where
       funcOnValue Leaf = mempty
 
       breadthFirst [] = []
-      breadthFirst nodes@(_ : _) = nodes <> (breadthFirst $ concatMap getChildren nodes)
+      breadthFirst nodes@(_ : _) = nodes <> breadthFirst (concatMap getChildren nodes)
 
       getChildren (Node _ l r) = [l, r]
       getChildren Leaf = []

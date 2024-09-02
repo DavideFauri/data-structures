@@ -36,8 +36,8 @@ cut depth (Infinite t) = Finite $ cut' depth t
     cut' _ Leaf = Leaf
     cut' d (Node x l r) = Node x left_cut right_cut
       where
-        left_cut = (cut' (d -1) l)
-        right_cut = (cut' (d -1) r)
+        left_cut = cut' (d -1) l
+        right_cut = cut' (d -1) r
 
 instance Show (FiniteTree (Integer, Integer)) where
   show (Finite t) = show . fmap represent $ t

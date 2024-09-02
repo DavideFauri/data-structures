@@ -6,7 +6,7 @@ import Test.Tasty.HUnit
 
 testInfiniteTree :: TestTree
 testInfiniteTree =
-  testGroup "Infinite Tree" $
+  testGroup "Infinite Tree"
     [ testCut0,
       testCut1,
       testCut2,

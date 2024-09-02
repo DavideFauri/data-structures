@@ -37,4 +37,4 @@ insert item (OrderedTree (InOrder t)) = OrderedTree . InOrder $ insert' item t
       | otherwise = Node c l (insert' x r)
 
 fromList :: (Ord a) => [a] -> OrderedTree a
-fromList l = foldl (flip insert) mempty l
+fromList = foldl (flip insert) mempty

@@ -12,7 +12,7 @@ import Test.Tasty.QuickCheck
 newtype AnyOrderedTree a = AnyOrderedTree (OrderedTree a) deriving (Show)
 
 instance (Ord a, Arbitrary a) => Arbitrary (AnyOrderedTree a) where
-  arbitrary = (AnyOrderedTree . fromList) <$> listOf arbitrary
+  arbitrary = AnyOrderedTree . fromList <$> listOf arbitrary
 
 isOrdered :: Ord a => OrderedTree a -> Bool
 isOrdered t =
@@ -32,7 +32,7 @@ testOrderedTree =
 
 testOrderedGeneration :: TestTree
 testOrderedGeneration =
-  testProperty "generates correctly" $
+  testProperty "generates correctly"
     (propOrderedGeneration :: OrderedList Int -> Bool)
   where
     propOrderedGeneration :: (Ord a) => OrderedList a -> Bool
@@ -40,7 +40,7 @@ testOrderedGeneration =
 
 testOrderedInsert :: TestTree
 testOrderedInsert =
-  testProperty "preserves ordering on inserts" $
+  testProperty "preserves ordering on inserts"
     (propOrderedInsert :: Int -> AnyOrderedTree Int -> Bool)
   where
     propOrderedInsert :: (Ord a) => a -> AnyOrderedTree a -> Bool
@@ -48,7 +48,7 @@ testOrderedInsert =
 
 testOrderedMerge :: TestTree
 testOrderedMerge =
-  testProperty "preserves ordering on merges" $
+  testProperty "preserves ordering on merges"
     (propOrderedMerge :: AnyOrderedTree Int -> AnyOrderedTree Int -> Bool)
   where
     propOrderedMerge :: (Ord a) => AnyOrderedTree a -> AnyOrderedTree a -> Bool

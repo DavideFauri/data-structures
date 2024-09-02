@@ -1,15 +1,16 @@
 import InfiniteTreeTest (testInfiniteTree)
 import OrderedTreeTest (testOrderedTree)
 import Test.Tasty
-import TreeSearchTest (testTreeSearch)
+-- import TreeSearchTest (testTreeSearch)
 import TreeTest (testSimpleTree)
 
 main :: IO ()
-main = defaultMain $ allTests
+main = defaultMain allTests
 
 allTests :: TestTree
 allTests =
-  testGroup "" $
+  testGroup ""
     [ testSimpleTree,
       testInfiniteTree,
+      testOrderedTree
     ]

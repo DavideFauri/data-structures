@@ -40,15 +40,15 @@ data ExampleTree a --(Show a, Eq a) =>
 
 testSimpleTree :: TestTree
 testSimpleTree =
-  testGroup "Tree" $
-    [ testGroup "Unit cases" $
+  testGroup "Tree"
+    [ testGroup "Unit cases"
         [ testUnitCase (emptyTree :: ExampleTree Double),
           testUnitCase singletonTree,
           testUnitCase smallIntTree,
           testUnitCase smallStringTree
         ],
-      testGroup "Instances" $
-        [ testGroup "Iso" $
+      testGroup "Instances"
+        [ testGroup "Iso"
             [ testIsomorphic (emptyTree :: ExampleTree Double) (emptyTree :: ExampleTree Char),
               testIsomorphic smallFuncTree smallIntTree,
               testNotIsomorphic (emptyTree :: ExampleTree Int) singletonTree,
@@ -57,7 +57,7 @@ testSimpleTree =
               testNotIsomorphic smallIntTree superIntTree,
               testNotIsomorphic smallIntTree notSuperIntTree
             ],
-          testGroup "IsoOrd" $
+          testGroup "IsoOrd"
             [ testSubmorphic (emptyTree :: ExampleTree Int) singletonTree,
               testSubmorphic singletonTree smallIntTree,
               testSubmorphic smallIntTree superIntTree,
