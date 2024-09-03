@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 -- for instance Show on overlapping types (String and Show a)
 {-# LANGUAGE IncoherentInstances #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Tree where
 
@@ -17,21 +18,26 @@ _prettyPrintWith customShow = prettyPrint 0
   where
     prettyPrint _ Leaf = ""
     prettyPrint depth (Node x l r) =
-      spacing <> customShow x <> "\n"
+      spacing
+        <> customShow x
+        <> "\n"
         <> prettyPrint (depth + 2) l
         <> prettyPrint (depth + 2) r
       where
         spacing = replicate depth ' '
 
 instance Show (Tree String) where
+  show :: Tree String -> String
   show = _prettyPrintWith id
 
-instance Show a => Show (Tree a) where
+instance (Show a) => Show (Tree a) where
+  show :: Tree a -> String
   show = _prettyPrintWith show
 
 -- STRUCTURE
 
 instance Iso Tree where
+  (~==) :: Tree a -> Tree b -> Bool
   Leaf ~== Leaf = True
   Leaf ~== Node {} = False
   Node {} ~== Leaf = False
@@ -40,6 +46,7 @@ instance Iso Tree where
   Node _ l1 r1 ~== Node _ l2 r2 = (l1 ~== l2) && (r1 ~== r2)
 
 instance IsoOrd Tree where
+  compare :: Tree a -> Tree b -> Maybe Ordering
   compare Leaf Leaf = Just EQ
   compare Leaf (Node {}) = Just LT
   compare (Node {}) Leaf = Just GT
@@ -57,12 +64,12 @@ showStructure = show . remap "X"
 
 -- DEPTH FIRST TRAVERSALS
 
-
 -- INORDER
 
 newtype InOrder a = InOrder (Tree a) deriving (Eq, Show, Functor)
 
 instance Foldable InOrder where
+  foldMap :: (Monoid m) => (a -> m) -> InOrder a -> m
   foldMap func (InOrder t) = foldMap' func t
     where
       foldMap' _ Leaf = mempty
@@ -73,6 +80,7 @@ instance Foldable InOrder where
 newtype PreOrder a = PreOrder (Tree a) deriving (Eq, Show, Functor)
 
 instance Foldable PreOrder where
+  foldMap :: (Monoid m) => (a -> m) -> PreOrder a -> m
   foldMap func (PreOrder t) = foldMap' func t
     where
       foldMap' _ Leaf = mempty
@@ -83,6 +91,7 @@ instance Foldable PreOrder where
 newtype PostOrder a = PostOrder (Tree a) deriving (Eq, Show, Functor)
 
 instance Foldable PostOrder where
+  foldMap :: (Monoid m) => (a -> m) -> PostOrder a -> m
   foldMap func (PostOrder t) = foldMap' func t
     where
       foldMap' _ Leaf = mempty
@@ -95,6 +104,7 @@ newtype LevelOrder a = LevelOrder (Tree a) deriving (Eq, Show, Functor)
 
 -- thanks to https://www.jjinux.com/2005/12/haskell-breadth-first-tree-traversal.html
 instance Foldable LevelOrder where
+  foldMap :: (Monoid m) => (a -> m) -> LevelOrder a -> m
   foldMap func (LevelOrder root) = foldMap funcOnValue $ breadthFirst [root]
     where
       funcOnValue (Node x _ _) = func x

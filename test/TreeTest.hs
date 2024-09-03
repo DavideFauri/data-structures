@@ -25,7 +25,7 @@ instance (Arbitrary a) => Arbitrary (AnyTree a) where
         r <- makeTree (n - m)
         pure $ Node x l r
 
-data ExampleTree a --(Show a, Eq a) =>
+data ExampleTree a -- (Show a, Eq a) =>
   = ExampleTree
   { name :: String,
     tree :: Tree a,
@@ -40,15 +40,19 @@ data ExampleTree a --(Show a, Eq a) =>
 
 testSimpleTree :: TestTree
 testSimpleTree =
-  testGroup "Tree"
-    [ testGroup "Unit cases"
+  testGroup
+    "Tree"
+    [ testGroup
+        "Unit cases"
         [ testUnitCase (emptyTree :: ExampleTree Double),
           testUnitCase singletonTree,
           testUnitCase smallIntTree,
           testUnitCase smallStringTree
         ],
-      testGroup "Instances"
-        [ testGroup "Iso"
+      testGroup
+        "Instances"
+        [ testGroup
+            "Iso"
             [ testIsomorphic (emptyTree :: ExampleTree Double) (emptyTree :: ExampleTree Char),
               testIsomorphic smallFuncTree smallIntTree,
               testNotIsomorphic (emptyTree :: ExampleTree Int) singletonTree,
@@ -57,7 +61,8 @@ testSimpleTree =
               testNotIsomorphic smallIntTree superIntTree,
               testNotIsomorphic smallIntTree notSuperIntTree
             ],
-          testGroup "IsoOrd"
+          testGroup
+            "IsoOrd"
             [ testSubmorphic (emptyTree :: ExampleTree Int) singletonTree,
               testSubmorphic singletonTree smallIntTree,
               testSubmorphic smallIntTree superIntTree,
@@ -78,7 +83,7 @@ testUnitCase ex =
       testCase "is traversed levelorder" $ testLevelOrder ex
     ]
 
-testShow :: Show a => ExampleTree a -> Assertion
+testShow :: (Show a) => ExampleTree a -> Assertion
 testShow ExampleTree {tree = t, toStr = s} = show t @?= s
 
 testInOrder :: (Show a, Eq a) => ExampleTree a -> Assertion

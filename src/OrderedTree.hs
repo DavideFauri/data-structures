@@ -13,10 +13,10 @@ import Tree (InOrder (..), Tree (..))
 
 newtype OrderedTree a = OrderedTree (InOrder a) deriving (Eq, Show, Foldable)
 
-instance Ord a => Semigroup (OrderedTree a) where
+instance (Ord a) => Semigroup (OrderedTree a) where
   (<>) = foldr insert
 
-instance Ord a => Monoid (OrderedTree a) where
+instance (Ord a) => Monoid (OrderedTree a) where
   mempty = OrderedTree . InOrder $ Leaf
 
 -- I have a binary tree whose node are sorted: i.e., each node in the left branch is smaller than the root, each node in the right branch is larger

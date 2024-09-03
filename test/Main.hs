@@ -9,7 +9,8 @@ main = defaultMain allTests
 
 allTests :: TestTree
 allTests =
-  testGroup ""
+  testGroup
+    ""
     [ testSimpleTree,
       testInfiniteTree,
       testOrderedTree

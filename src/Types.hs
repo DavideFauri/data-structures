@@ -12,7 +12,7 @@ class Iso m where
 -- This typeclass is a variant of Ord:
 -- It is used to test if two structures satisfy the subgraph isomorphism problem
 -- That is, if the subset of a structure is isomorphic to the other one
-class Iso m => IsoOrd m where
+class (Iso m) => IsoOrd m where
   -- first structure is isomorphic to (subset of) second structure
   (~<=) :: m a -> m b -> Bool
   s ~<= s' = case Types.compare s s' of
