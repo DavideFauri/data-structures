@@ -1,3 +1,4 @@
+{-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE DeriveFunctor #-}
 -- for instance Show (Tree String)
 {-# LANGUAGE FlexibleInstances #-}
@@ -75,6 +76,17 @@ instance Foldable InOrder where
       foldMap' _ Leaf = mempty
       foldMap' f (Node x l r) = foldMap' f l <> f x <> foldMap' f r
 
+instance Traversable InOrder where
+  sequenceA :: (Applicative f) => InOrder (f a) -> f (InOrder a)
+  sequenceA (InOrder root) = InOrder <$> sequenceA' root
+    where
+      sequenceA' Leaf = pure Leaf
+      sequenceA' (Node x l r) = do
+        l' <- sequenceA' l
+        x' <- x
+        r' <- sequenceA' r
+        return $ Node x' l' r'
+
 -- PREORDER
 
 newtype PreOrder a = PreOrder (Tree a) deriving (Eq, Show, Functor)
@@ -85,6 +97,17 @@ instance Foldable PreOrder where
     where
       foldMap' _ Leaf = mempty
       foldMap' f (Node x l r) = f x <> foldMap' f l <> foldMap' f r
+
+instance Traversable PreOrder where
+  sequenceA :: (Applicative f) => PreOrder (f a) -> f (PreOrder a)
+  sequenceA (PreOrder root) = PreOrder <$> sequenceA' root
+    where
+      sequenceA' Leaf = pure Leaf
+      sequenceA' (Node x l r) = do
+        x' <- x
+        l' <- sequenceA' l
+        r' <- sequenceA' r
+        return $ Node x' l' r'
 
 -- POSTORDER
 
@@ -97,6 +120,16 @@ instance Foldable PostOrder where
       foldMap' _ Leaf = mempty
       foldMap' f (Node x l r) = foldMap' f l <> foldMap' f r <> f x
 
+instance Traversable PostOrder where
+  sequenceA :: (Applicative f) => PostOrder (f a) -> f (PostOrder a)
+  sequenceA (PostOrder root) = PostOrder <$> sequenceA' root
+    where
+      sequenceA' Leaf = pure Leaf
+      sequenceA' (Node x l r) = do
+        l' <- sequenceA' l
+        r' <- sequenceA' r
+        x' <- x
+        return $ Node x' l' r'
 
 -- BREADTH FIRST TRAVERSAL (level order)
 
